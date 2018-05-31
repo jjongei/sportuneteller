@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: org.webjars.bower:jquery-validation:1.17.0">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.webjars.bower/jquery-validation/1.17.0/2e3d59fe0223c16fabf7009a482fb19732b29ad1/jquery-validation-1.17.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.webjars.bower/jquery-validation/1.17.0/b04f3ee8f5e43fa3b162981b50bb72fe1acabb33/jquery-validation-1.17.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

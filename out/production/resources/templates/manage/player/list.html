@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Pyeong Chang Olympic</title>
+    <link rel="stylesheet" href="/webjars/bootstrap/3.3.4/dist/css/bootstrap.min.css"/>
+    <script src="/webjars/jquery/2.1.3/dist/jquery.min.js"></script>
+    <script src="/webjars/jquery-validation/1.17.0/dist/jquery.validate.min.js"></script>
+    <script src="/webjars/bootstrap/3.3.4/dist/js/bootstrap.min.js"></script>
+    <style type="text/css">
+        body { padding-top: 100px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <nav class="navbar navbar-default navbar-fixed-top navbar-inverse">
+            <div class="container">
+                <h3>
+                    <div class="collapse navbar-collapse">
+                        <ul class="nav navbar-nav">
+                            <li><a href="#" th:href="@{/vote/games}">Game</a></li>
+                            <li><a href="#" th:href="@{/vote/teams}">Team</a></li>
+                            <li class="active"><a href="#" th:href="@{/manage/players}">Player</a></li>
+                            <li><a href="#" th:href="@{/manage/countries}">Country</a></li>
+                        </ul>
+                        <form id="form-excel" class="navbar-form  navbar-right"
+                              th:action="@{/manage/players/upload}" method="post" enctype="multipart/form-data">
+                            <div class="form-group">
+                                <label for="files"></label>
+                                <input class="form-control"  multiple="multiple" type="file" id="files" name="files" required="required"/>
+                            </div>
+                            <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-upload" aria-hidden="true"></span>&nbsp;Upload</button>
+                            <button type="button" id="file-down" class="btn btn-default"><span class="glyphicon glyphicon-download" aria-hidden="true"></span>&nbsp;Download</button>
+                        </form>
+                    </div>
+                </h3>
+            </div>
+        </nav>
+    </div>
+    <div class="row">
+        <div class="col-md-12" role="main">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <form id="form-search" class="form-inline" th:action="@{/manage/players/search}" method="post" th:object="${dossiers}">
+                        <input type="hidden" data-page-attr="offset" th:field="*{offset}"/>
+                        <input type="hidden" data-page-attr="page" th:field="*{currentPage}"/>
+                        <div class="form-group">
+                            <label>Game Type</label>
+                            <select th:field="*{params.gameType}" class="form-control">
+                                <option value=""></option>
+                                <option th:each="item:*{gameTypeItems}" th:value="${item.key}" th:text="${item.key} +':' + ${item.value}"></option>
+                            </select>
+                        </div>
+                        &nbsp;
+                        &nbsp;
+                        <div class="form-group">
+                            <label>Country</label>
+                            <select th:field="*{params.countryCode}" class="form-control">
+                                <option value=""></option>
+                                <option th:each="item:*{countryItems}" th:value="${item.key}" th:text="${item.value}"></option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <input type="text" class="form-control" th:field="*{params.name}" placeholder="Player name" autocomplete="off" />
+                        </div>
+                        <br/>
+                        <div class="form-group">
+                            <div class="checkbox">
+                                <label>
+                                    <input class="form-control" type="checkbox" th:field="*{params.male}" /> <span>Male</span>
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input class="form-control" type="checkbox" th:field="*{params.female}" /> <span>Female</span>
+                                </label>
+                            </div>
+                        </div>
+                        &nbsp;
+                        &nbsp;
+                        <button type="button" class="btn btn-danger"  id="btn-search"><span class="glyphicon glyphicon-search" aria-hidden="true"></span> Search</button>
+                        <button type="button" class="btn btn-default" id="btn-reset"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Reset</button>
+                    </form>
+                </div>
+                <div class="row" style="padding: 10px;">
+                    <div class="col-md-12">
+                        <table class="table table-bordered">
+                            <caption>
+                                        <span  th:if="${dossiers.hasContent}" >
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <ul class="pagination pagination-sm paging-margin">
+                                                        <li th:class="${dossiers.hasPreviousPage ? '':'disabled'}" th:attr="data-page=${dossiers.previousPage}">
+                                                            <a href="#">
+                                                                <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+                                                            </a>
+                                                        </li>
+                                                        <li th:each="index : ${#numbers.sequence(dossiers.startIndex, dossiers.endIndex)}" th:class="${index eq dossiers.currentPage ? 'active':''}" th:attr="data-page=${index}">
+                                                            <a href="#" th:text="${index}">1</a>
+                                                        </li>
+                                                        <li th:class="${dossiers.hasNextPage ? '':'disabled'}" th:attr="data-page=${dossiers.nextPage}">
+                                                            <a href="#">
+                                                                <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+                                                            </a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                                <div class="col-md-6 text-right" style="margin-top: 25px;">
+                                                  <strong>Showing <span th:text="${dossiers.numberTo}">1</span> to <span th:text="${dossiers.numberFrom}">10</span> of <span th:text="${dossiers.total}">57</span> entries</strong>
+                                                </div>
+                                            </div>
+                                        </span>
+                            </caption>
+                            <thead>
+                            <tr>
+                                <th class="text-center" width="10%">ID</th>
+                                <th class="text-center" width="20%">Code</th>
+                                <th class="text-center" width="10%">Country</th>
+                                <th class="text-center"> Name</th>
+                                <th class="text-center" width="15%">Sexuality(Male)</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="content : ${dossiers.contents}">
+                                <td class="text-center" th:text="${content.playerId}">KR</td>
+                                <td>
+                                    <strong th:text="${content.gameTypeCode}"></strong>
+                                    <small th:text="${content.gameTypeSubject}"></small>
+                                </td>
+                                <td class="text-center">
+                                    <span th:text="${content.countryCode}"></span>
+                                </td>
+                                <td class="text-center">
+                                    <span th:text="${content.name}"></span>
+                                </td>
+                                <td class="text-center">
+                                    <label class="label label-danger" th:if="${content.sexuality}">Male</label>
+                                    <label class="label label-primary" th:if="${!content.sexuality}">Female</label>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script th:inline="javascript"> var contextRoot = /*[[@{/}]]*/ ''; </script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $("#form-excel").validate();
+
+
+        $('#file-down').on('click', function(e){
+            window.location.href=contextRoot+'/manage/players/download';
+        });
+
+        $('#btn-reset').on('click', function(){
+            window.location.href=contextRoot+'/manage/players/search';
+        });
+
+        $('#btn-search').on('click', function(){
+            $('#form-search').find('[data-page-attr="page"]').val(1);
+            $('#form-search').submit();
+        });
+
+        $('.pagination > li').each(function(event){
+            $(this).on('click', function(){
+                if(!$(this).hasClass('disabled')){
+                    $('#form-search').find('[data-page-attr="page"]').val($(this).attr('data-page'));
+                    $('#form-search').submit();
+                }
+            })
+        });
+
+    });
+</script>
+</html>
